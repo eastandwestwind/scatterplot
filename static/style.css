@@ -1,3 +1,10 @@
-path.point.selected {
+path.point {
+    stroke: white !important;
+    stroke-width: 10px !important;
+}
 
+path.point.selected {
+    stroke: black !important;
+    stroke-width: 1px !important;
+    stroke-opacity: .3;
 }

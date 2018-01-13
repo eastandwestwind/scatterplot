@@ -127,7 +127,7 @@ module.exports = [
 	{
 		"start_time": "2017-12-17T22:22:12Z",
 		"status": "error",
-		"duration": 20,
+		"duration": 220,
 	},
 	{
 		"start_time": "2017-12-18T02:24:12Z",

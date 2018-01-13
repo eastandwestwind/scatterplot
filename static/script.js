@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const plotDiv = document.getElementById('plot');
+	let dragLayer;
 	let transformedData = {x: [] , y: [], color: []};
 	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
 	const layout = {height: 650, autoscale: true};
@@ -22,6 +23,23 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 				console.log(response.data);
 				Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
+				const pointNodeList = document.querySelectorAll('g.points path.point');
+				plotDiv.on('plotly_click', function(data){
+					if (!data.points || !data.points[0]) {
+						return
+					}
+					let selectedPoint = data.points[0].pointIndex;
+					pointNodeList[selectedPoint].classList.toggle('selected');
+				});
+				dragLayer = document.getElementsByClassName('nsewdrag')[0];
+
+				plotDiv.on('plotly_hover', function(data){
+					dragLayer.style.cursor = 'pointer'
+				});
+
+				plotDiv.on('plotly_unhover', function(data){
+					dragLayer.style.cursor = ''
+				});
 			})
 			.catch(function (error) {
 				console.log(error)
@@ -30,15 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	window.addEventListener('resize', function() { Plotly.Plots.resize(plotDiv); });
 
-	plotDiv.on('plotly_click', function(data){
-		// console.log('data' , data);
-		point = data.points[0];
-		console.log('point', point);
-		x2.push(point.x);
-		y2.push(point.y);
-		Plotly.restyle('myDiv', {'x':[undefined, x2], 'y':[undefined, y2]});
-		console.log('x2 ', x2)
-	});
+	//
+
+	// plotDiv.addEventListener('click',function (e) {
+	// 	console.log(e.target);
+	// 	console.log(e.currentTarget);
+	// 	this.classList.toggle('selected');
+	// });
 
 	function getData(response) {
 		response.map(function(obj) {
@@ -58,10 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			y: transformedData.y,
 			mode: "markers",
 			name: "Scatterplot",
-			text: ["test,test,test"],
 			marker: {
 				color: transformedData.color,
-				size: 20,
+				size: 35,
 				line: {
 					color: "white",
 					width: 0.5

@@ -39,7 +39,6 @@ function buildDataModel(transformedData) {
 		y: transformedData.y,
 		mode: "markers",
 		name: "Scatterplot",
-		text: ["test,test,test"],
 		marker: {
 		color: transformedData.color,
 			size: 20,
