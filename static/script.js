@@ -1,6 +1,6 @@
-// import * as vis from 'vis';
 document.addEventListener('DOMContentLoaded', function () {
-	const dataDiv = document.getElementById('data');
+	const iframePlot = document.getElementById('plot');
+	const data = document.getElementById('plot');
 
 	const script = document.createElement('script');
 	script.type = 'text/javascript';
@@ -14,13 +14,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 	function httpRequest() {
-		axios.get('/api/data')
+		axios.get('/plot')
 			.then(function (response) {
-				dataDiv.innerHTML = JSON.stringify(response.data);
-				console.log(response)
+				if (!response.data) {
+					return;
+				}
+				// FIXME: embed not appending
+				iframePlot.src = `${response.data}.embed`;
+				data.src = response.data;
+				console.log(`${response.data}.embed`)
 			})
 			.catch(function (error) {
-				dataDiv.innerHTML = error;
+				data.innerHTML = error;
 			});
 	}
 });

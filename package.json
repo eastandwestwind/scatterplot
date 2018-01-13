@@ -14,7 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "express": "^4.16.2",
+    "plotly": "^1.0.6",
     "vis": "^4.21.0"
   }
 }
