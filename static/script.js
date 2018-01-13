@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const iframePlot = document.getElementById('plot');
-	const data = document.getElementById('plot');
+	const plotDiv = document.getElementById('plot');
+	let transformedData = {x: [] , y: [], color: []};
+	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
+	const layout = {fileopt : "overwrite", filename : "simple-node-example"};
 
 	const script = document.createElement('script');
 	script.type = 'text/javascript';
@@ -12,20 +14,48 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 	document.getElementsByTagName('head')[0].appendChild(script);
 
-
 	function httpRequest() {
-		axios.get('/plot')
+		axios.get('/api/data')
 			.then(function (response) {
 				if (!response.data) {
-					return;
+					return
 				}
-				// FIXME: embed not appending
-				iframePlot.src = `${response.data}.embed`;
-				data.src = response.data;
-				console.log(`${response.data}.embed`)
+				console.log(response.data);
+				Plotly.newPlot(plotDiv, [getData(response.data)], layout);
 			})
 			.catch(function (error) {
-				data.innerHTML = error;
+				console.log(error)
 			});
+	}
+
+	function getData(response) {
+		response.map(function(obj) {
+			transformedData['x'].push(parseTime(obj['start_time']));
+			transformedData['y'].push(obj['duration'] / (1.0*60));
+			transformedData['color'].push(colorMap[obj['status']]);
+		});
+		console.log(buildDataModel(transformedData));
+		return buildDataModel(transformedData);
+	}
+	function parseTime(time) {
+		return time.replace(/([a-zA-Z])/g, " ").trim();
+	}
+	function buildDataModel(transformedData) {
+		return {
+			x: transformedData.x,
+			y: transformedData.y,
+			mode: "markers",
+			name: "Scatterplot",
+			text: ["test,test,test"],
+			marker: {
+				color: transformedData.color,
+				size: 20,
+				line: {
+					color: "white",
+					width: 0.5
+				}
+			},
+			type: "scatter"
+		};
 	}
 });

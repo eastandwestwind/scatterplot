@@ -23,15 +23,16 @@ module.exports = function getData() {
 	// 	.catch(function (error) {
 	// 		console.log(error)
 	// 	});
-	console.log(mockData);
 	mockData.map(function(obj) {
-		transformedData['x'].push(Date.parse(obj['start_time']));
-		transformedData['y'].push(obj['duration']);
+		transformedData['x'].push(parseTime(obj['start_time']));
+		transformedData['y'].push(obj['duration'] / (1.0*60));
 		transformedData['color'].push(colorMap[obj['status']]);
 	});
 	return buildDataModel(transformedData);
 };
-
+function parseTime(time) {
+	return time.replace(/([a-zA-Z])/g, " ").trim();
+}
 function buildDataModel(transformedData) {
 	return {
 		x: transformedData.x,
@@ -41,7 +42,7 @@ function buildDataModel(transformedData) {
 		text: ["test,test,test"],
 		marker: {
 		color: transformedData.color,
-			size: 12,
+			size: 20,
 			line: {
 			color: "white",
 				width: 0.5
