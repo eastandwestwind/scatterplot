@@ -8,3 +8,30 @@ path.point.selected {
     stroke-width: 1px !important;
     stroke-opacity: .3;
 }
+
+#legend {
+    text-align: right;
+    color: #BEBEBE;
+    font-size: 20px
+}
+
+#legend div {
+    height: 20px;
+    width: 20px;
+    border-radius: 25px;
+    display: inline-block;
+}
+
+#legend span {
+    padding-right: 10px;
+}
+
+#legend div#pass {
+    background-color: rgb(0, 128, 0);
+}
+#legend div#error {
+    background-color: rgb(255, 165, 0);
+}
+#legend div#fail {
+    background-color: rgb(255, 0, 0);
+}

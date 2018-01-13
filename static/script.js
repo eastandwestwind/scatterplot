@@ -3,7 +3,24 @@ document.addEventListener('DOMContentLoaded', function () {
 	let dragLayer;
 	let transformedData = {x: [] , y: [], color: []};
 	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
-	const layout = {height: 650, autoscale: true};
+	const layout = {
+		height: 650,
+		autoscale: true,
+		hovermode:'closest',
+		xaxis: {
+			showgrid: false,
+			ticks: 'outside',
+			tickfont: {
+				size: 20,
+				color: '#BEBEBE'
+			},
+		},
+		yaxis: {
+			tickfont: {
+				size: 20,
+				color: '#BEBEBE'
+			},
+		}};
 
 	const script = document.createElement('script');
 	script.type = 'text/javascript';
