@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const plotDiv = document.getElementById('plot');
 	let transformedData = {x: [] , y: [], color: []};
 	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
-	const layout = {fileopt : "overwrite", filename : "simple-node-example"};
+	const layout = {height: 650, autoscale: true};
 
 	const script = document.createElement('script');
 	script.type = 'text/javascript';
@@ -21,12 +21,24 @@ document.addEventListener('DOMContentLoaded', function () {
 					return
 				}
 				console.log(response.data);
-				Plotly.newPlot(plotDiv, [getData(response.data)], layout);
+				Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
 			})
 			.catch(function (error) {
 				console.log(error)
 			});
 	}
+
+	window.addEventListener('resize', function() { Plotly.Plots.resize(plotDiv); });
+
+	plotDiv.on('plotly_click', function(data){
+		// console.log('data' , data);
+		point = data.points[0];
+		console.log('point', point);
+		x2.push(point.x);
+		y2.push(point.y);
+		Plotly.restyle('myDiv', {'x':[undefined, x2], 'y':[undefined, y2]});
+		console.log('x2 ', x2)
+	});
 
 	function getData(response) {
 		response.map(function(obj) {
