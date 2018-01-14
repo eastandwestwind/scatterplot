@@ -37,26 +37,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		type: "scatter"
 	};
 
-	// waits until axios is loaded before making api call
-	const script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = 'https://unpkg.com/axios/dist/axios.min.js';
-	if (script.addEventListener) {
-		script.addEventListener('load', httpRequest, false);
-	} else if (script.readyState) {
-		script.onreadystatechange = httpRequest;
-	}
-	document.getElementsByTagName('head')[0].appendChild(script);
+	axios.get('/api/data')
+		.then(function (response) {
+			success(response)
+		})
+		.catch(function (error) {
+			console.log(error)
+		});
 
-	function httpRequest() {
-		axios.get('/api/data')
-			.then(function (response) {
-				success(response)
-			})
-			.catch(function (error) {
-				console.log(error)
-			});
-	}
 	function success(response) {
 		// generates plot
 		Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
