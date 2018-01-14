@@ -37,3 +37,4 @@ Navigate to `http://localhost:3000/`.
 ## <a name="dependencies">Dependencies</a>
 
 * [express](https://expressjs.com/en/4x/api.html)- provides app endpoints, error handling, publicly accessible files
+* [axios](https://github.com/axios/axios)- promise based HTTP client
