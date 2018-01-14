@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const plotDiv = document.getElementById('plot');
-	let dragLayer;
-	let transformedData = {x: [] , y: [], color: []};
 	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
+	let dragLayer;
+	let dataPointsObject = {x: [] , y: [], color: []};
 	const layout = {
 		height: 650,
 		autoscale: true,
@@ -21,7 +21,23 @@ document.addEventListener('DOMContentLoaded', function () {
 				color: '#BEBEBE'
 			},
 		}};
+	let plotDataModel = {
+		x: dataPointsObject.x,
+		y: dataPointsObject.y,
+		mode: "markers",
+		name: "Scatterplot",
+		marker: {
+			color: dataPointsObject.color,
+				size: 35,
+				line: {
+				color: "white",
+					width: 0.5
+			}
+		},
+		type: "scatter"
+	};
 
+	// waits until axios is loaded before making api call
 	const script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = 'https://unpkg.com/axios/dist/axios.min.js';
@@ -35,71 +51,52 @@ document.addEventListener('DOMContentLoaded', function () {
 	function httpRequest() {
 		axios.get('/api/data')
 			.then(function (response) {
-				if (!response.data) {
-					return
-				}
-				console.log(response.data);
-				Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
-				const pointNodeList = document.querySelectorAll('g.points path.point');
-				plotDiv.on('plotly_click', function(data){
-					if (!data.points || !data.points[0]) {
-						return
-					}
-					let selectedPoint = data.points[0].pointIndex;
-					pointNodeList[selectedPoint].classList.toggle('selected');
-				});
-				dragLayer = document.getElementsByClassName('nsewdrag')[0];
-
-				plotDiv.on('plotly_hover', function(data){
-					dragLayer.style.cursor = 'pointer'
-				});
-
-				plotDiv.on('plotly_unhover', function(data){
-					dragLayer.style.cursor = ''
-				});
+				success(response)
 			})
 			.catch(function (error) {
 				console.log(error)
 			});
 	}
+	function success(response) {
+		// generates plot
+		Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
 
-	window.addEventListener('resize', function() { Plotly.Plots.resize(plotDiv); });
+		// toggles class on click
+		const pointNodeList = document.querySelectorAll('g.points path.point');
+		plotDiv.on('plotly_click', function(data){
+			if (!data.points || !data.points[0]) {
+				return
+			}
+			let selectedPoint = data.points[0].pointIndex;
+			pointNodeList[selectedPoint].classList.toggle('selected');
+		});
 
-	//
+		// changes cursor style on hover
+		dragLayer = document.getElementsByClassName('nsewdrag')[0];
+		plotDiv.on('plotly_hover', function(){
+			dragLayer.style.cursor = 'pointer'
+		});
+		plotDiv.on('plotly_unhover', function(){
+			dragLayer.style.cursor = ''
+		});
 
-	// plotDiv.addEventListener('click',function (e) {
-	// 	console.log(e.target);
-	// 	console.log(e.currentTarget);
-	// 	this.classList.toggle('selected');
-	// });
-
+		// resizes plot
+		window.addEventListener('resize', function() { Plotly.Plots.resize(plotDiv); });
+	}
 	function getData(response) {
 		response.map(function(obj) {
-			transformedData['x'].push(parseTime(obj['start_time']));
-			transformedData['y'].push(obj['duration'] / (1.0*60));
-			transformedData['color'].push(colorMap[obj['status']]);
+			dataPointsObject['x'].push(parseTime(obj['start_time']));
+			dataPointsObject['y'].push(obj['duration'] / (1.0*60));
+			dataPointsObject['color'].push(colorMap[obj['status']]);
 		});
-		console.log(buildDataModel(transformedData));
-		return buildDataModel(transformedData);
+		return populatePlotDataModel(dataPointsObject);
 	}
 	function parseTime(time) {
 		return time.replace(/([a-zA-Z])/g, " ").trim();
 	}
-	function buildDataModel(transformedData) {
-		return {
-			x: transformedData.x,
-			y: transformedData.y,
-			mode: "markers",
-			name: "Scatterplot",
-			marker: {
-				color: transformedData.color,
-				size: 35,
-				line: {
-					color: "white",
-					width: 0.5
-				}
-			},
-			type: "scatter"
-		};
+	function populatePlotDataModel(transformedData) {
+		plotDataModel.x = transformedData.x;
+		plotDataModel.y = transformedData.y;
+		return plotDataModel;
 	}
 });
