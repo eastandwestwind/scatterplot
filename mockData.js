@@ -145,7 +145,7 @@ module.exports = [
 		"duration": 90,
 	},
 	{
-		"start_time": "2017-12-21T6:12:12Z",
+		"start_time": "2017-12-21T06:12:12Z",
 		"status": "pass",
 		"duration": 200,
 	}

@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const plotDiv = document.getElementById('plot');
 	const colorMap = {'pass': 'green', 'error': 'orange', 'fail': 'red'};
 	let dragLayer;
-	let dataPointsObject = {x: [] , y: [], color: []};
+	const datePickerStart = document.getElementById('start-date');
+	const datePickerEnd = document.getElementById('end-date');
 	const layout = {
 		height: 650,
 		autoscale: true,
@@ -21,33 +22,33 @@ document.addEventListener('DOMContentLoaded', function () {
 				color: '#BEBEBE'
 			},
 		}};
-	let plotDataModel = {
-		x: dataPointsObject.x,
-		y: dataPointsObject.y,
-		mode: "markers",
-		name: "Scatterplot",
-		marker: {
-			color: dataPointsObject.color,
-				size: 35,
-				line: {
-				color: "white",
-					width: 0.5
-			}
-		},
-		type: "scatter"
-	};
 
-	axios.get('/api/data')
-		.then(function (response) {
-			success(response)
-		})
-		.catch(function (error) {
-			console.log(error)
-		});
+
+	function getData(startDate, endDate) {
+		axios.get('/api/data/', {params:{startDate: startDate, endDate: endDate}})
+			.then(function (response) {
+				success(response)
+			})
+			.catch(function (error) {
+				alert(error)
+			});
+	}
 
 	function success(response) {
-		// generates plot
-		Plotly.newPlot(plotDiv, [getData(response.data)], layout, {displayModeBar: false});
+		Plotly.purge(plotDiv);
+		// generates and renders plot
+		Plotly.newPlot(plotDiv, [constructPlotlyData(response.data)], layout, {displayModeBar: false});
+
+		if (!datePickerStart.value || !datePickerEnd.value) {
+			if (response.data.length === 0) {
+				return;
+			}
+			populateDatePickers(response.data);
+		}
+
+		datePickerStart.onchange = datePickerEnd.onchange = function() {
+			getData(datePickerStart.value, datePickerEnd.value)
+		};
 
 		// toggles class on click
 		const pointNodeList = document.querySelectorAll('g.points path.point');
@@ -71,20 +72,41 @@ document.addEventListener('DOMContentLoaded', function () {
 		// resizes plot
 		window.addEventListener('resize', function() { Plotly.Plots.resize(plotDiv); });
 	}
-	function getData(response) {
-		response.map(function(obj) {
+	function constructPlotlyData(responseData) {
+		let dataPointsObject = {x: [] , y: [], color: []};
+		responseData.map(function(obj) {
 			dataPointsObject['x'].push(parseTime(obj['start_time']));
 			dataPointsObject['y'].push(obj['duration'] / (1.0*60));
 			dataPointsObject['color'].push(colorMap[obj['status']]);
 		});
-		return populatePlotDataModel(dataPointsObject);
+		return {
+			x: dataPointsObject.x,
+			y: dataPointsObject.y,
+			mode: "markers",
+			name: "Scatterplot",
+			marker: {
+				color: dataPointsObject.color,
+				size: 35,
+				line: {
+					color: "white",
+					width: 0.5
+				}
+			},
+			type: "scatter"
+		};
 	}
 	function parseTime(time) {
 		return time.replace(/([a-zA-Z])/g, " ").trim();
 	}
-	function populatePlotDataModel(transformedData) {
-		plotDataModel.x = transformedData.x;
-		plotDataModel.y = transformedData.y;
-		return plotDataModel;
+	function populateDatePickers(responseData) {
+		let dateArray = responseData.map(function(date) {
+			return date['start_time'];
+		});
+		dateArray.sort(function(a,b){
+			return new Date(b) - new Date(a);
+		});
+		datePickerStart.value = dateArray[dateArray.length-1].replace(/T.*$/,"");
+		datePickerEnd.value = dateArray[0].replace(/T.*$/,"");
 	}
+	getData();
 });
