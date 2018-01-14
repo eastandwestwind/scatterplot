@@ -12,12 +12,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			showgrid: false,
 			ticks: 'outside',
 			tickfont: {
+				family: 'Arial, sans-serif',
 				size: 20,
 				color: '#BEBEBE'
 			},
 		},
 		yaxis: {
+			tickvals:['1','2','3','4'],
+			ticktext: ['1 min', '2 min', '3 min', '4 min'],
 			tickfont: {
+				family: 'Arial, sans-serif',
 				size: 20,
 				color: '#BEBEBE'
 			},

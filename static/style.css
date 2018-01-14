@@ -35,3 +35,6 @@ path.point.selected {
 #legend div#fail {
     background-color: rgb(255, 0, 0);
 }
+label {
+    padding-left: 20px;
+}
