@@ -19,4 +19,4 @@ app.use(express.static('static'));
 // creates alias for use client-side
 app.use('/axios', express.static(__dirname + '/node_modules/axios/dist/'));
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
